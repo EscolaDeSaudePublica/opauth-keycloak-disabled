@@ -36,10 +36,10 @@ class keycloakStrategy extends OpauthStrategy
      */
     public $defaults = array(
         'redirect_uri' => '{complete_url_to_strategy}oauth2callback',
-        'scope' => 'public_profile email full_name',
-        'auth_endpoint' => 'https://meu.rs.gov.br/oauth/v2/auth',
-        'token_endpoint' => 'https://meu.rs.gov.br/oauth/v2/token',
-        'user_info_endpoint' => 'https://meu.rs.gov.br/api/v1/person.json'
+        'scope' => 'profile email',
+        'auth_endpoint' => 'https://dev.id.org.br/auth/realms/saude/protocol/openid-connect/auth',
+        'token_endpoint' => 'https://dev.id.org.br/auth/realms/saude/protocol/openid-connect/token',
+        'user_info_endpoint' => 'https://dev.id.org.br/auth/realms/saude/protocol/openid-connect/userinfo'
     );
 
     /**
@@ -87,28 +87,30 @@ class keycloakStrategy extends OpauthStrategy
                 'redirect_uri' => $this->strategy['redirect_uri'],
                 'grant_type' => 'authorization_code'
             );
+            //POST PARA KEYCLOAK COM OS DADOS E RECEBENDO A RESPOSTA
             $response = $this->serverPost($url, $params, null, $headers);
-
-            $results = json_decode($response);
-
-            if (!empty($results) && !empty($results->access_token)) {
-                $userinfo = $this->userinfo($results->access_token);
-
+            
+            $results = json_decode($response, true);
+            
+            if (!empty($results) && !empty($results['access_token'])) {
+                //TOKEN EM FORMATO JWT
+                $userinfo = $this->userinfo($results['access_token']);
+                                
                 $this->auth = array(
-                    'uid' => $userinfo['id'],
+                    'uid' => $userinfo['sub'],//ID DO USUÁRIO NO KEYCLOAK
                     'info' => array(),
                     'credentials' => array(
-                        'token' => $results->access_token,
-                        'expires' => date('c', time() + $results->expires_in)
+                        'token' => $results['access_token'],
+                        'expires' => date('c', time() + $results['expires_in'])
                     ),
                     'raw' => $userinfo
                 );
-
-                if (!empty($results->refresh_token)) {
-                    $this->auth['credentials']['refresh_token'] = $results->refresh_token;
+                //
+                if (!empty($result['refresh_token'])) {
+                    $this->auth['credentials']['refresh_token'] = $result['refresh_token'];
                 }
-
-                $this->mapProfile($userinfo, 'name', 'first_name');
+                //MAPEANDO O PERFIL COM O QUE VEM DE DADOS DO KEYCLOAK
+                $this->mapProfile($userinfo, 'name', 'name');
                 $this->mapProfile($userinfo, 'email', 'email');
                 $this->mapProfile($userinfo, 'given_name', 'first_name');
                 $this->mapProfile($userinfo, 'family_name', 'surname');
@@ -135,6 +137,7 @@ class keycloakStrategy extends OpauthStrategy
 
             $this->errorCallback($error);
         }
+        
     }
 
     /**
@@ -145,10 +148,16 @@ class keycloakStrategy extends OpauthStrategy
      */
     private function userinfo($access_token)
     {
-        $userinfo = $this->serverGet($this->strategy['user_info_endpoint'],
-            array('access_token' => $access_token), null, $headers);
+        //RECEBENDO O TOKEN E PASSANDO PARA SER DECODIFICADO
+        $userinfo = JWT::decode(
+            $access_token, 
+            null, 
+            array('RS256')
+        );
+        
         if (!empty($userinfo)) {
-            return $this->recursiveGetObjectVars(json_decode($userinfo));
+            $encUserInfo = json_encode($userinfo);
+            return $this->recursiveGetObjectVars(json_decode($encUserInfo));
         } else {
             $error = array(
                 'code' => 'userinfo_error',
