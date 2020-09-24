@@ -1,20 +1,21 @@
-Opauth-LoginCidadao
+Opauth-Keycloak
 =============
-[Opauth][1] strategy for LoginCidadao authentication.
+[Opauth][1] strategy for Keycloak authentication.
 
-Implemented based on https://developers.loginCidadao.com/accounts/docs/OAuth2 using OAuth 2.0.
+Implemented based onhttps://developers.keycloak.com/accounts/docs/OAuth2 using OAuth 2.0.
 
 Opauth is a multi-provider authentication framework for PHP.
 
 Getting started
 ----------------
-1. Install Opauth-LoginCidadao:
+1. Install Opauth-Keycloak:
    ```bash
    cd path_to_opauth/Strategy
    git clone git://github.com/uzyn/opauth-loginCidadao.git LoginCidadao
    ```
 
 2. Create a LoginCidadao APIs project at https://code.loginCidadao.com/apis/console/
+   - Registgra em App.php $this->registerAuthProvider('keycloak');
    - You do not have to enable any services from the Services tab.
    - Make sure to go to **API Access** tab and **Create an OAuth 2.0 client ID**.
    - Choose **Web application** for *Application type*
