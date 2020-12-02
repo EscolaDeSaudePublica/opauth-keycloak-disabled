@@ -1,7 +1,23 @@
+Getting started
+----------------	----------------
+1. Install Opauth-Keycloak:
+   In applications for using cultural maps
+   ```bash
+   cd src/protected
+   ```
+
+   composer.json add 
+      ```
+      "opauth/keycloak" : "*",
+      ```
+   In "repositories"
    ```
    git clone https://github.com/EscolaDeSaudePublica/opauth-keycloak keycloak
    ```
-   
+   Or access src/protected/vendor/opauth
+   ```
+   git clone https://github.com/EscolaDeSaudePublica/opauth-keycloak keycloak
+   ```
 
 2. Create a KeyCloak APIs project at https://code.loginCidadao.com/apis/console/
    - Registgra em App.php $this->registerAuthProvider('keycloak');
