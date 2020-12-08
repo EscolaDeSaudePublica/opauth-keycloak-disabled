@@ -12,7 +12,7 @@ Getting started
       ```
    In "repositories"
    ```
-   git clone https://github.com/EscolaDeSaudePublica/opauth-keycloak keycloak
+   https://github.com/EscolaDeSaudePublica/opauth-keycloak
    ```
    Or access src/protected/vendor/opauth
    ```
@@ -20,8 +20,17 @@ Getting started
    ```
 
 2. Create a KeyCloak APIs project at https://code.loginCidadao.com/apis/console/
-   - Registgra em App.php $this->registerAuthProvider('keycloak');
-   - You do not have to enable any services from the Services tab.
+   - Registgra em App.php $this->registerAuthProvider('keycloak'); or add the register() method within your theme and write the code in your theme - (file Theme.php)
+   ```
+       function register() {
+        parent::register();
+
+        $app = App::i();
+        $app->registerAuthProvider('keycloak');
+    }
+    ```
+   - Rove the OpauthKeyCloak.php file to the protected/application/lib/Mapasculturais/AuthProvaiders path
+   - You do not have to enable any services from the Services tab
    - Make sure to go to **API Access** tab and **Create an OAuth 2.0 client ID**.
    - Choose **Web application** for *Application type*
    - Make sure that redirect URI is set to actual OAuth 2.0 callback URL, usually `http://path_to_opauth/keycloak/oauth2callback`
@@ -30,6 +39,8 @@ Getting started
 3. Configure your keycloakStrategy.php class the way you prefer.
 
 4. Configure your authentication.php file
+
+5. Option
 
 
 Strategy configuration
