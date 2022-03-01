@@ -245,8 +245,8 @@ class OpauthKeyCloak extends \MapasCulturais\AuthProvider{
         $user->authProvider = $response['auth']['provider'];
         $user->authUid = $response['auth']['uid'];
         $user->email = $response['auth']['raw']['email'];
-        if (!empty($response['auth']['raw']['CPF'])) {
-            $user->cpf = $response['auth']['raw']['CPF'];
+        if (!empty($response['auth']['raw']['preferred_username'])) {
+            $user->cpf = $response['auth']['raw']['preferred_username'];
         }
         if (!empty($response['auth']['raw']['TELEFONE'])) {
             $user->telefone = $response['auth']['raw']['TELEFONE'];
