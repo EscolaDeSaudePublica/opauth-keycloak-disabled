@@ -211,8 +211,7 @@ class OpauthKeyCloak extends \MapasCulturais\AuthProvider{
                 $response = $this->_getResponse();
                 $user = $this->createUser($response);
 
-                $profile = $user->profile;
-                $this->_setRedirectPath($this->onCreateRedirectUrl ? $this->onCreateRedirectUrl : $profile->editUrl);
+                $this->lastRedirectPath();
             }
             $this->_setAuthenticatedUser($user);
             App::i()->applyHook('auth.successful');
@@ -222,6 +221,11 @@ class OpauthKeyCloak extends \MapasCulturais\AuthProvider{
             App::i()->applyHook('auth.failed');
             return false;
         }
+    }
+    //Método que pega a última URL antes de criar o login ou do usuário logar no mapa da saúde
+    public function lastRedirectPath(){
+        $path = $this->_setRedirectPath($_SESSION['UriHttpReferer']);
+        return $path;
     }
 
     protected function _createUser($response) {
@@ -243,7 +247,7 @@ class OpauthKeyCloak extends \MapasCulturais\AuthProvider{
         $app->em->persist($user);
         // cria um agente do tipo user profile para o usuário criado acima
         $agent = new Entities\Agent($user);
-        $agent->status = 0;
+        $agent->status = 1;
 
         if(isset($response['auth']['raw']['name']) && isset($response['auth']['raw']['surname'])){
             $agent->name = $response['auth']['raw']['name'] . ' ' . $response['auth']['raw']['surname'];
